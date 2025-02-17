@@ -1,7 +1,8 @@
-import { createContext, use, useContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { TodoItem } from './components/todoItem/TodoItem'
 import { ITask, ITodoContext, Status } from './components/todoForm/types'
 import './App.css'
+import { useLocalStorage } from './components/localStorage/useLocalStorage'
 
 export const StoreTodoContext = createContext< ITodoContext | null>(null)
 
@@ -12,25 +13,16 @@ function App() {
   const [filtered, setFiltered] = useState<ITask[]>(todos)
   const [status, setStatus] = useState<Status>(Status.All)
 
-  const storedTasks = localStorage.getItem('todos')
+  const [storedTasks, setStoredTasks] = useLocalStorage('todos', []) // [..., ...]
   
   useEffect(() => {
-    if(storedTasks) {
-      try { 
-        const parseTasks = JSON.parse(storedTasks)
-        setTodos(parseTasks)
-        setFiltered(parseTasks)
-      
-      } catch(error) {
-        console.log('Ошибка получения задач', error);
-      }
-      
-    }
+      setTodos(storedTasks)
+      setFiltered(storedTasks)
     
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('todos', JSON.stringify(todos))
+    setStoredTasks(todos)
   }, [todos])
 
   useEffect(() => {
@@ -48,33 +40,16 @@ function App() {
   const todoFilter = (status: Status) => {
     setStatus(status)
 
-    // выполняется проверка всех if
-
-    // if(){
-
-    // }
-
-    // if() {
-
-    // }
-
-    // if() {
-
-    // }
-
-    
   }
 
 
 
   const deleteTodo = (id: number | string) => {
     setTodos([...todos.filter((todo) => todo.id !== id)])
-    // setFiltered([...filtered.filter((todo) => todo.id !== id)])
   }
 
   const setComplete = (id: number | string) => {
     setTodos([...todos.map((todo) => todo.id === id ? {...todo, completed :!todo.completed} : {...todo})])
-    // setFiltered([...filtered.map((todo) => todo.id === id ? {...todo, completed :!todo.completed} : {...todo})])
   }
 
 
